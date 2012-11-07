@@ -109,6 +109,13 @@
         // translate to current view (vector from topLeft to 0,0)
         var offset = mapProjection.fromLatLngToPoint(canvasLayer.getTopLeft());
 
+        camera.position.x = offset.x * scale;
+        camera.position.y = - offset.y * scale;
+
+        particles.scale.x = scale;
+        particles.scale.y = scale;
+        particles.scale.z = scale;
+
         console.log("update", offset);
 
       }
