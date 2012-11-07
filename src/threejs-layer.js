@@ -9,7 +9,7 @@ function initThree(){
 
   var material, parameters, i, h;
 
-  var width = 1024, height = 768;
+  var width = 1, height = 1;
 
   init();
   animate();
@@ -17,11 +17,11 @@ function initThree(){
   function init() {
 
     camera = new THREE.OrthographicCamera(
-      width / -2,   // Left
-      width / 2,    // Right
-      height / 2,   // Top
-      height / -2,
-      -3000,        // Near clipping plane
+      0,        // Left
+      width,    // Right
+      0,        // Top
+      height,   // Bottom
+      -3000,    // Near clipping plane
       3000
     );
 
@@ -41,9 +41,11 @@ function initThree(){
 
         point = projection.fromLatLngToPoint(location);
 
-      vertex.x = point.x;
-      vertex.y = -point.y;
+      vertex.x = point.x / 256;
+      vertex.y = point.y / 256;
       vertex.z = -100;
+
+      console.log(vertex.x, vertex.y);
 
       geometry.vertices.push( vertex );
     }
@@ -69,7 +71,7 @@ function initThree(){
       clearAlpha: 0
     });
 
-    renderer.setSize( 1024, 768 );
+    renderer.setSize(1000, 1000);
 
     canvasLayer.getPanes().overlayLayer.appendChild( renderer.domElement );
     canvasLayer.canvas = renderer.domElement;

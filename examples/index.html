@@ -35,7 +35,7 @@
       function init() {
         // initialize the map
         var mapOptions = {
-          zoom: 2,
+          zoom: 0,
           center: new google.maps.LatLng(10, 0),
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           styles: [
@@ -110,14 +110,14 @@
         // translate to current view (vector from topLeft to 0,0)
         var offset = mapProjection.fromLatLngToPoint(canvasLayer.getTopLeft());
 
-        camera.position.x = offset.x * scale;
-        camera.position.y = - offset.y * scale;
+        camera.position.x = offset.x ;
+        camera.position.y = offset.y / 256;
 
-        // camera.scale.x = scale;
-        // camera.scale.y = scale;
+        camera.scale.x = canvasLayer.canvas.width / 256 / scale;
+        camera.scale.y = canvasLayer.canvas.height / 256 / scale;
         // camera.scale.z = 1;
 
-        console.log("update", offset);
+        console.log("update", offset.y);
 
       }
 
