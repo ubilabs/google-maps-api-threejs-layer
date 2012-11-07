@@ -1,12 +1,13 @@
 
+var camera, scene, renderer, particles, geometry;
+
 function initThree(){
 
 
   if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 
-  var container, stats;
-  var camera, scene, renderer, particles, geometry, material, parameters, i, h;
+  var material, parameters, i, h;
 
   var width = 1024, height = 768;
 
@@ -14,10 +15,6 @@ function initThree(){
   animate();
 
   function init() {
-
-    container = document.createElement( 'div' );
-    container.className = "webgl";
-    document.body.appendChild( container );
 
     camera = new THREE.OrthographicCamera(
       width / -2,   // Left
@@ -65,8 +62,12 @@ function initThree(){
       clearColor: 0x000000,
       clearAlpha: 0
     });
+
     renderer.setSize( 1024, 768 );
-    container.appendChild( renderer.domElement );
+
+    canvasLayer.getPanes().overlayLayer.appendChild( renderer.domElement );
+    canvasLayer.canvas = renderer.domElement;
+
   }
 
   function animate() {

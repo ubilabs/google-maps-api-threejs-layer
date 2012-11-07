@@ -30,14 +30,7 @@
     <script>
       var map;
       var canvasLayer;
-      var gl;
 
-      var pointProgram;
-      var pointArrayBuffer;
-      var POINT_COUNT = photos.length;
-
-      var pixelsToWebGLMatrix = new Float32Array(16);
-      var mapMatrix = new Float32Array(16);
 
       function init() {
         // initialize the map
@@ -92,22 +85,18 @@
         // initialize the canvasLayer
         var canvasLayerOptions = {
           map: map,
-          //resizeHandler: resize,
+          resizeHandler: resize,
           animate: false,
-          //updateHandler: update
+          updateHandler: update
         };
 
         canvasLayer = new CanvasLayer(canvasLayerOptions);
-
-        initThree();
-        return;
       }
 
-    
-      function loadData() {
-        // this data could be loaded from anywhere, but in this case we'll
-        // generate some random x,y coords in a world coordinate bounding box
-        var rawData = new Float32Array(2 * POINT_COUNT);
+
+      function resize(){
+        console.log("resize");
+        initThree();
       }
 
       function update() {
@@ -116,11 +105,11 @@
 
         // Scale to current zoom (worldCoords * 2^zoom)
         var scale = Math.pow(2, map.zoom);
-        scaleMatrix(mapMatrix, scale, scale);
 
         // translate to current view (vector from topLeft to 0,0)
         var offset = mapProjection.fromLatLngToPoint(canvasLayer.getTopLeft());
-        // translateMatrix(mapMatrix, -offset.x, -offset.y);
+
+        console.log("update", offset);
 
       }
 
