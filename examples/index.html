@@ -104,7 +104,8 @@
         var mapProjection = map.getProjection();
 
         // Scale to current zoom (worldCoords * 2^zoom)
-        var scale = Math.pow(2, map.zoom);
+        var zoom = map.zoom;
+        var scale = Math.pow(2, zoom);
 
         // translate to current view (vector from topLeft to 0,0)
         var offset = mapProjection.fromLatLngToPoint(canvasLayer.getTopLeft());
@@ -112,9 +113,9 @@
         camera.position.x = offset.x * scale;
         camera.position.y = - offset.y * scale;
 
-        particles.scale.x = scale;
-        particles.scale.y = scale;
-        particles.scale.z = scale;
+        // camera.scale.x = scale;
+        // camera.scale.y = scale;
+        // camera.scale.z = 1;
 
         console.log("update", offset);
 

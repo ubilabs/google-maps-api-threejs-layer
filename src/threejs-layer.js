@@ -21,7 +21,7 @@ function initThree(){
       width / 2,    // Right
       height / 2,   // Top
       height / -2,
-      -3000,            // Near clipping plane
+      -3000,        // Near clipping plane
       3000
     );
 
@@ -31,13 +31,19 @@ function initThree(){
 
     geometry = new THREE.Geometry();
 
-    for ( i = 0; i < 60000; i ++ ) {
+    var projection = map.getProjection();
 
-      var vertex = new THREE.Vector3();
+    for ( i = 0; i < photos.length; i ++ ) {
 
-      vertex.x = Math.random() * width - width/2;
-      vertex.y = Math.random() * height - height/2;
-      vertex.z = Math.random() * width - width/2;
+      var photo = photos[i],
+        vertex = new THREE.Vector3(),
+        location = new google.maps.LatLng(photo[0], photo[1]),
+
+        point = projection.fromLatLngToPoint(location);
+
+      vertex.x = point.x;
+      vertex.y = -point.y;
+      vertex.z = -100;
 
       geometry.vertices.push( vertex );
     }
@@ -76,16 +82,6 @@ function initThree(){
   }
 
   function render() {
-    var time = Date.now() * 0.00005;
-    for ( i = 0; i < scene.children.length; i ++ ) {
-
-      var object = scene.children[ i ];
-
-      if ( object instanceof THREE.ParticleSystem ) {
-        object.rotation.y = time * ( i < 4 ? i + 1 : - ( i + 1 ) );
-      }
-    }
-
     renderer.render( scene, camera );
   }
 
