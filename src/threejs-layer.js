@@ -23,7 +23,7 @@ ThreejsLayer.prototype.initialize = function(options){
   this.layer = new CanvasLayer({
     map: this.map,
     animate: false,
-    resizeHandler: this.finalize
+    callback: this.finalize
   });
 
   this.canvas = this.layer.canvas;
