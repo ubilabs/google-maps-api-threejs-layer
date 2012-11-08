@@ -1,119 +1,124 @@
 
-var camera, scene, renderer, particles, geometry;
-
-
-function initThree(){
-
-  var canvasLayer;
-  
-  // initialize the canvasLayer
-  var canvasLayerOptions = {
-    map: map,
-    resizeHandler: init,
-    animate: false,
-    updateHandler: update
-  };
-
-  canvasLayer = new CanvasLayer(canvasLayerOptions);
-
+var camera, scene, renderer, particles, geometry, layer;
   var material, parameters, i, h;
 
 
-  function init() {
+function ThreejsLayer(options){
+  this.initialize(options || {});
+}
 
-    camera = new THREE.OrthographicCamera(0, 1, 0, 1, -3000, 3000);
+function bind(func, thisArg) {
+  return function() { func.apply(thisArg); };
+}
 
-    camera.position.z = 1000;
+ThreejsLayer.prototype.update = function() {
 
-    scene = new THREE.Scene();
+  var projection = this.map.getProjection(),
+    zoom = this.map.getZoom(),
+    scale = Math.pow(2, zoom),
+    offset = projection.fromLatLngToPoint(layer.getTopLeft());
 
-    geometry = new THREE.Geometry();
+  camera.position.x = offset.x / 256 ;
+  camera.position.y = offset.y / 256;
 
-    var projection = map.getProjection();
+  camera.scale.x = layer.canvas.width / 256 / scale;
+  camera.scale.y = layer.canvas.height / 256 / scale;
+};
 
-    for ( i = 0; i < photos.length; i ++ ) {
+ThreejsLayer.prototype.render = function() {
+  renderer.render( scene, camera );
+};
 
-      var photo = photos[i],
-        vertex = new THREE.Vector3(),
-        location = new google.maps.LatLng(photo[0], photo[1]),
-        point = projection.fromLatLngToPoint(location);
+ThreejsLayer.prototype.animate = function() {
+  requestAnimationFrame( bind(this.animate, this) );
+  this.render();
+};
 
-      vertex.x = point.x / 256;
-      vertex.y = point.y / 256;
-      vertex.z = 0;
+ThreejsLayer.prototype.initialize = function(options){
 
-      geometry.vertices.push( vertex );
-    }
+  this.map = options.map;
 
-    var texture = new THREE.Texture( generateSprite() );
-    texture.needsUpdate = true;
+  layer = new CanvasLayer({
+    map: this.map,
+    resizeHandler: bind(this.init, this),
+    animate: false,
+    updateHandler: this.update
+  });
 
-    material = new THREE.ParticleBasicMaterial({
-      size: 20,
-      map: texture,
-      opacity: 0.3,
-      blending: THREE.AdditiveBlending,
-      depthTest: false,
-      transparent: true
-    });
+  camera = new THREE.OrthographicCamera(0, 1, 0, 1, -3000, 3000);
 
-    particles = new THREE.ParticleSystem( geometry, material );
+  camera.position.z = 1000;
 
-    scene.add( particles );
+  scene = new THREE.Scene();
 
-    renderer = new THREE.WebGLRenderer({
-      clearColor: 0x000000,
-      clearAlpha: 0
-    });
+  geometry = new THREE.Geometry();
+  
+};
 
-    renderer.setSize(1000, 1000);
+ThreejsLayer.prototype.init = function() {
 
-    canvasLayer.getPanes().overlayLayer.appendChild( renderer.domElement );
-    canvasLayer.canvas = renderer.domElement;
+  var projection = this.map.getProjection();
 
-    animate();
+  for ( i = 0; i < photos.length; i ++ ) {
 
+    var photo = photos[i],
+      vertex = new THREE.Vector3(),
+      location = new google.maps.LatLng(photo[0], photo[1]),
+      point = projection.fromLatLngToPoint(location);
+
+    vertex.x = point.x / 256;
+    vertex.y = point.y / 256;
+    vertex.z = 0;
+
+    geometry.vertices.push( vertex );
   }
 
-  function update() {
+  var texture = new THREE.Texture( generateSprite() );
+  texture.needsUpdate = true;
 
-    var projection = map.getProjection(),
-      zoom = map.getZoom(),
-      scale = Math.pow(2, zoom),
-      offset = projection.fromLatLngToPoint(canvasLayer.getTopLeft());
+  material = new THREE.ParticleBasicMaterial({
+    size: 20,
+    map: texture,
+    opacity: 0.3,
+    blending: THREE.AdditiveBlending,
+    depthTest: false,
+    transparent: true
+  });
 
-    camera.position.x = offset.x / 256 ;
-    camera.position.y = offset.y / 256;
+  particles = new THREE.ParticleSystem( geometry, material );
 
-    camera.scale.x = canvasLayer.canvas.width / 256 / scale;
-    camera.scale.y = canvasLayer.canvas.height / 256 / scale;
-  }
+  scene.add( particles );
 
-  function animate() {
-    requestAnimationFrame( animate );
-    render();
-  }
+  renderer = new THREE.WebGLRenderer({
+    clearColor: 0x000000,
+    clearAlpha: 0
+  });
 
-  function render() {
-    renderer.render( scene, camera );
-  }
+  renderer.setSize(1000, 1000);
 
-  function generateSprite() {
+  layer.getPanes().overlayLayer.appendChild( renderer.domElement );
+  layer.canvas = renderer.domElement;
 
-    var canvas = document.createElement( 'canvas' );
+  this.animate();
+};
 
-    canvas.width = 20;
-    canvas.height = 20;
+function generateSprite() {
 
-    var context = canvas.getContext( '2d' );
-    var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
-    gradient.addColorStop( 1.0, 'rgba(255,255,255,0)' );
-    gradient.addColorStop( 0.0, 'rgba(255,255,255,1)' );
+  var canvas = document.createElement( 'canvas' );
 
-    context.fillStyle = gradient;
-    context.fillRect( 0, 0, canvas.width, canvas.height );
+  canvas.width = 20;
+  canvas.height = 20;
 
-    return canvas;
+  var context = canvas.getContext( '2d' );
+  var gradient = context.createRadialGradient(
+    canvas.width / 2, canvas.height / 2, 0,
+    canvas.width / 2, canvas.height / 2, canvas.width / 2
+  );
+  gradient.addColorStop( 1.0, 'rgba(255,255,255,0)' );
+  gradient.addColorStop( 0.0, 'rgba(255,255,255,1)' );
 
-  }
+  context.fillStyle = gradient;
+  context.fillRect( 0, 0, canvas.width, canvas.height );
+
+  return canvas;
 }

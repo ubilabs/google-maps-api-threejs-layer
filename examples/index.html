@@ -40,7 +40,9 @@
           styles: styles
         });
 
-        initThree();
+        new ThreejsLayer({
+          map: map
+        });
       }
 
       document.addEventListener('DOMContentLoaded', init, false);
