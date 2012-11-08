@@ -13,7 +13,8 @@
     </style>
 
     <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
-    <script src="data.json"></script>
+    <script src="data.js"></script>
+    <script src="styles.js"></script>
     <script src="../src/lib/detector.js"></script>
     <script src="../src/lib/canvaslayer.js"></script>
     <script src="../src/lib/three.js"></script>
@@ -21,86 +22,25 @@
 
     <script>
       var map;
-      var canvasLayer;
+      
 
       function init() {
-        // initialize the map
-        var mapOptions = {
-          zoom: 0,
+
+        if ( ! Detector.webgl ) {
+          Detector.addGetWebGLMessage();
+          return;
+        }
+
+        var container = document.getElementById('map-div');
+
+        map = new google.maps.Map(container, {
+          zoom: 2,
           center: new google.maps.LatLng(10, 0),
           mapTypeId: google.maps.MapTypeId.ROADMAP,
-          styles: [
-            {
-              "stylers": [
-                { "invert_lightness": true },
-                { "saturation": -100 },
-                { "visibility": "on" }
-              ]
-            },{
-              "elementType": "labels",
-              "stylers": [
-                { "visibility": "off" }
-              ]
-            },{
-              "featureType": "landscape",
-              "stylers": [
-                { "color": "#000000" }
-              ]
-            },{
-              "featureType": "road",
-              "stylers": [
-                { "visibility": "off" }
-              ]
-            },{
-              "featureType": "poi",
-              "stylers": [
-                { "visibility": "off" }
-              ]
-            },{
-              "featureType": "administrative",
-              "stylers": [
-                { "visibility": "off" }
-              ]
-            },{
-              "featureType": "administrative.country",
-              "elementType": "geometry",
-              "stylers": [
-                { "visibility": "on" }
-              ]
-            }
-          ]
-        };
-        var mapDiv = document.getElementById('map-div');
-        map = new google.maps.Map(mapDiv, mapOptions);
+          styles: styles
+        });
 
-        // initialize the canvasLayer
-        var canvasLayerOptions = {
-          map: map,
-          resizeHandler: resize,
-          animate: false,
-          updateHandler: update
-        };
-
-        canvasLayer = new CanvasLayer(canvasLayerOptions);
-      }
-
-      function resize(){
-        console.log("resize");
         initThree();
-      }
-
-      function update() {
-
-        var projection = map.getProjection(),
-          zoom = map.getZoom(),
-          scale = Math.pow(2, zoom),
-          offset = projection.fromLatLngToPoint(canvasLayer.getTopLeft());
-
-        camera.position.x = offset.x / 256 ;
-        camera.position.y = offset.y / 256;
-
-        camera.scale.x = canvasLayer.canvas.width / 256 / scale;
-        camera.scale.y = canvasLayer.canvas.height / 256 / scale;
       }
 
       document.addEventListener('DOMContentLoaded', init, false);

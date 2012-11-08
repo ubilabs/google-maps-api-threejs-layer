@@ -1,15 +1,23 @@
 
 var camera, scene, renderer, particles, geometry;
 
+
 function initThree(){
 
-  if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+  var canvasLayer;
+  
+  // initialize the canvasLayer
+  var canvasLayerOptions = {
+    map: map,
+    resizeHandler: init,
+    animate: false,
+    updateHandler: update
+  };
 
+  canvasLayer = new CanvasLayer(canvasLayerOptions);
 
   var material, parameters, i, h;
 
-  init();
-  animate();
 
   function init() {
 
@@ -28,14 +36,11 @@ function initThree(){
       var photo = photos[i],
         vertex = new THREE.Vector3(),
         location = new google.maps.LatLng(photo[0], photo[1]),
-
         point = projection.fromLatLngToPoint(location);
 
       vertex.x = point.x / 256;
       vertex.y = point.y / 256;
-      vertex.z = -100;
-
-      console.log(vertex.x, vertex.y);
+      vertex.z = 0;
 
       geometry.vertices.push( vertex );
     }
@@ -66,6 +71,22 @@ function initThree(){
     canvasLayer.getPanes().overlayLayer.appendChild( renderer.domElement );
     canvasLayer.canvas = renderer.domElement;
 
+    animate();
+
+  }
+
+  function update() {
+
+    var projection = map.getProjection(),
+      zoom = map.getZoom(),
+      scale = Math.pow(2, zoom),
+      offset = projection.fromLatLngToPoint(canvasLayer.getTopLeft());
+
+    camera.position.x = offset.x / 256 ;
+    camera.position.y = offset.y / 256;
+
+    camera.scale.x = canvasLayer.canvas.width / 256 / scale;
+    camera.scale.y = canvasLayer.canvas.height / 256 / scale;
   }
 
   function animate() {
