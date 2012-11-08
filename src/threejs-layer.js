@@ -3,29 +3,19 @@ var camera, scene, renderer, particles, geometry;
 
 function initThree(){
 
-
   if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 
   var material, parameters, i, h;
-
-  var width = 1, height = 1;
 
   init();
   animate();
 
   function init() {
 
-    camera = new THREE.OrthographicCamera(
-      0,        // Left
-      width,    // Right
-      0,        // Top
-      height,   // Bottom
-      -3000,    // Near clipping plane
-      3000
-    );
+    camera = new THREE.OrthographicCamera(0, 1, 0, 1, -3000, 3000);
 
-    camera.position.z = 1500;
+    camera.position.z = 1000;
 
     scene = new THREE.Scene();
 

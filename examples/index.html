@@ -10,14 +10,6 @@
         padding: 0;
         height: 100%;
       }
-
-      .webgl {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-      }
     </style>
 
     <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
@@ -30,7 +22,6 @@
     <script>
       var map;
       var canvasLayer;
-
 
       function init() {
         // initialize the map
@@ -93,7 +84,6 @@
         canvasLayer = new CanvasLayer(canvasLayerOptions);
       }
 
-
       function resize(){
         console.log("resize");
         initThree();
@@ -101,29 +91,20 @@
 
       function update() {
 
-        var mapProjection = map.getProjection();
+        var projection = map.getProjection(),
+          zoom = map.getZoom(),
+          scale = Math.pow(2, zoom),
+          offset = projection.fromLatLngToPoint(canvasLayer.getTopLeft());
 
-        // Scale to current zoom (worldCoords * 2^zoom)
-        var zoom = map.zoom;
-        var scale = Math.pow(2, zoom);
-
-        // translate to current view (vector from topLeft to 0,0)
-        var offset = mapProjection.fromLatLngToPoint(canvasLayer.getTopLeft());
-
-        camera.position.x = offset.x ;
+        camera.position.x = offset.x / 256 ;
         camera.position.y = offset.y / 256;
 
         camera.scale.x = canvasLayer.canvas.width / 256 / scale;
         camera.scale.y = canvasLayer.canvas.height / 256 / scale;
-        // camera.scale.z = 1;
-
-        console.log("update", offset.y);
-
       }
 
       document.addEventListener('DOMContentLoaded', init, false);
     </script>
-
 
   </head>
 
