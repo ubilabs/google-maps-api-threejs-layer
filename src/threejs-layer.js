@@ -23,9 +23,10 @@ ThreejsLayer.prototype.initialize = function(options){
   this.layer = new CanvasLayer({
     map: this.map,
     animate: false,
-    resizeHandler: this.finalize,
-    updateHandler: this.update
+    resizeHandler: this.finalize
   });
+
+  this.canvas = this.layer.canvas;
 
   this.camera = new THREE.OrthographicCamera(0, 1, 0, 1, -3000, 3000);
   this.camera.position.z = 1000;
@@ -39,7 +40,7 @@ ThreejsLayer.prototype.initialize = function(options){
 
   this.resize();
 
-  google.maps.event.addListener(this.map, 'bounds_changed', this.resize);
+  google.maps.event.addListener(this.map, 'bounds_changed', this.update);
 };
 
 ThreejsLayer.prototype.resize = function(){
@@ -60,28 +61,34 @@ ThreejsLayer.prototype.resize = function(){
 ThreejsLayer.prototype.update = function() {
 
   var projection = this.map.getProjection(),
-    zoom, scale, offset;
+    zoom, scale, offset, bounds, topLeft;
 
   if (!projection){ return; }
 
+  bounds = this.map.getBounds();
+
+  topLeft = new google.maps.LatLng(
+    bounds.getNorthEast().lat(),
+    bounds.getSouthWest().lng()
+  );
+
   zoom = this.map.getZoom();
   scale = Math.pow(2, zoom);
-  offset = projection.fromLatLngToPoint(this.layer.getTopLeft());
+  offset = projection.fromLatLngToPoint(topLeft);
+
+  this.resize();
 
   this.camera.position.x = offset.x / 256 ;
   this.camera.position.y = offset.y / 256;
 
-  this.camera.scale.x = this.layer.canvas.width / 256 / scale;
-  this.camera.scale.y = this.layer.canvas.height / 256 / scale;
+  this.camera.scale.x = this.width / 256 / scale;
+  this.camera.scale.y = this.height / 256 / scale;
+
+  this.render();
 };
 
 ThreejsLayer.prototype.render = function() {
   this.renderer.render( this.scene, this.camera );
-};
-
-ThreejsLayer.prototype.animate = function() {
-  requestAnimationFrame( this.animate );
-  this.render();
 };
 
 ThreejsLayer.prototype.add = function(geometry){
@@ -110,6 +117,5 @@ ThreejsLayer.prototype.finalize = function() {
     this.callback(this);
   }
 
-  this.resize();
-  this.animate();
+  this.update();
 };
