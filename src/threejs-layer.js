@@ -1,53 +1,19 @@
-var particles, geometry;
-  var material, parameters, i, h;
-
-
-function ThreejsLayer(options){
+function ThreejsLayer(options, callback){
   this.bindAll();
+  this.callback = callback;
   this.initialize(options || {});
 }
 
 ThreejsLayer.prototype.bindAll = function(){
-  var instance = this,
-    method;
+  var instance = this;
 
-  function bind(func) {
-    return function() { return func.apply(instance, arguments); };
+  function bind(name) {
+    var method = instance[name];
+    if (typeof method != "function"){ return; }
+    instance[name] = function() { return method.apply(instance, arguments); };
   }
 
-  for (var all in this){
-    method = this[all];
-    if (typeof method == "function"){
-      this[all] = bind(method);
-    }
-  }
-};
-
-ThreejsLayer.prototype.update = function() {
-
-  var projection = this.map.getProjection(),
-    zoom, scale, offset;
-
-  if (!projection){ return; }
-
-  zoom = this.map.getZoom();
-  scale = Math.pow(2, zoom);
-  offset = projection.fromLatLngToPoint(this.layer.getTopLeft());
-
-  this.camera.position.x = offset.x / 256 ;
-  this.camera.position.y = offset.y / 256;
-
-  this.camera.scale.x = this.layer.canvas.width / 256 / scale;
-  this.camera.scale.y = this.layer.canvas.height / 256 / scale;
-};
-
-ThreejsLayer.prototype.render = function() {
-  this.renderer.render( this.scene, this.camera );
-};
-
-ThreejsLayer.prototype.animate = function() {
-  requestAnimationFrame( this.animate );
-  this.render();
+  for (var all in instance){ bind(all); }
 };
 
 ThreejsLayer.prototype.initialize = function(options){
@@ -91,45 +57,58 @@ ThreejsLayer.prototype.resize = function(){
   this.update();
 };
 
+ThreejsLayer.prototype.update = function() {
+
+  var projection = this.map.getProjection(),
+    zoom, scale, offset;
+
+  if (!projection){ return; }
+
+  zoom = this.map.getZoom();
+  scale = Math.pow(2, zoom);
+  offset = projection.fromLatLngToPoint(this.layer.getTopLeft());
+
+  this.camera.position.x = offset.x / 256 ;
+  this.camera.position.y = offset.y / 256;
+
+  this.camera.scale.x = this.layer.canvas.width / 256 / scale;
+  this.camera.scale.y = this.layer.canvas.height / 256 / scale;
+};
+
+ThreejsLayer.prototype.render = function() {
+  this.renderer.render( this.scene, this.camera );
+};
+
+ThreejsLayer.prototype.animate = function() {
+  requestAnimationFrame( this.animate );
+  this.render();
+};
+
+ThreejsLayer.prototype.add = function(geometry){
+  this.scene.add(geometry);
+};
+
+ThreejsLayer.prototype.fromLatLngToVertex = function(latLng) {
+  var projection = this.map.getProjection(),
+    point = projection.fromLatLngToPoint(latLng),
+    vertex = new THREE.Vector3();
+
+  vertex.x = point.x / 256;
+  vertex.y = point.y / 256;
+  vertex.z = 0;
+
+  return vertex;
+};
+
 ThreejsLayer.prototype.finalize = function() {
-
-  var projection = this.map.getProjection();
-
-  var geometry = new THREE.Geometry();
-
-  for ( i = 0; i < photos.length; i ++ ) {
-
-    var photo = photos[i],
-      vertex = new THREE.Vector3(),
-      location = new google.maps.LatLng(photo[0], photo[1]),
-      point = projection.fromLatLngToPoint(location);
-
-    vertex.x = point.x / 256;
-    vertex.y = point.y / 256;
-    vertex.z = 0;
-
-    geometry.vertices.push( vertex );
-  }
-
-  var texture = new THREE.Texture( generateSprite() );
-  texture.needsUpdate = true;
-
-  material = new THREE.ParticleBasicMaterial({
-    size: 20,
-    map: texture,
-    opacity: 0.3,
-    blending: THREE.AdditiveBlending,
-    depthTest: false,
-    transparent: true
-  });
-
-  particles = new THREE.ParticleSystem( geometry, material );
-
-  this.scene.add( particles );
 
   this.layer.getPanes().overlayLayer.appendChild( this.renderer.domElement );
   this.canvas = this.renderer.domElement;
   this.layer.canvas = this.canvas;
+
+  if (this.callback){
+    this.callback(this);
+  }
 
   this.resize();
   this.animate();

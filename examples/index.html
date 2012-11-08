@@ -22,11 +22,10 @@
 
     <script>
       var map;
-      
 
       function init() {
 
-        if ( ! Detector.webgl ) {
+        if (!Detector.webgl) {
           Detector.addGetWebGLMessage();
           return;
         }
@@ -40,8 +39,31 @@
           styles: styles
         });
 
-        new ThreejsLayer({
-          map: map
+        new ThreejsLayer({ map: map }, function(layer){
+          
+          var geometry = new THREE.Geometry();
+
+          photos.forEach(function(photo){
+            var location = new google.maps.LatLng(photo[0], photo[1]),
+              vertex = layer.fromLatLngToVertex(location);
+
+            geometry.vertices.push( vertex );
+          });
+
+          var texture = new THREE.Texture( generateSprite() );
+          texture.needsUpdate = true;
+
+          material = new THREE.ParticleBasicMaterial({
+            size: 20,
+            map: texture,
+            opacity: 0.3,
+            blending: THREE.AdditiveBlending,
+            depthTest: false,
+            transparent: true
+          });
+
+          var particles = new THREE.ParticleSystem( geometry, material );
+          layer.add( particles );
         });
       }
 
