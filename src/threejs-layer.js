@@ -1,13 +1,27 @@
 var particles, geometry;
   var material, parameters, i, h;
 
+
 function ThreejsLayer(options){
+  this.bindAll();
   this.initialize(options || {});
 }
 
-function bind(func, thisArg) {
-  return function() { func.apply(thisArg); };
-}
+ThreejsLayer.prototype.bindAll = function(){
+  var instance = this,
+    method;
+
+  function bind(func) {
+    return function() { return func.apply(instance, arguments); };
+  }
+
+  for (var all in this){
+    method = this[all];
+    if (typeof method == "function"){
+      this[all] = bind(method);
+    }
+  }
+};
 
 ThreejsLayer.prototype.update = function() {
 
@@ -32,7 +46,7 @@ ThreejsLayer.prototype.render = function() {
 };
 
 ThreejsLayer.prototype.animate = function() {
-  requestAnimationFrame( bind(this.animate, this) );
+  requestAnimationFrame( this.animate );
   this.render();
 };
 
@@ -43,8 +57,8 @@ ThreejsLayer.prototype.initialize = function(options){
   this.layer = new CanvasLayer({
     map: this.map,
     animate: false,
-    resizeHandler: bind(this.finalize, this),
-    updateHandler: bind(this.update, this)
+    resizeHandler: this.finalize,
+    updateHandler: this.update
   });
 
   this.camera = new THREE.OrthographicCamera(0, 1, 0, 1, -3000, 3000);
@@ -59,7 +73,7 @@ ThreejsLayer.prototype.initialize = function(options){
 
   this.resize();
 
-  google.maps.event.addListener(this.map, 'bounds_changed', bind(this.resize, this));
+  google.maps.event.addListener(this.map, 'bounds_changed', this.resize);
 };
 
 ThreejsLayer.prototype.resize = function(){
