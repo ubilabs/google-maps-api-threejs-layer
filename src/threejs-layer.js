@@ -2,7 +2,35 @@ function ThreejsLayer(options, callback){
   this.bindAll();
   this.callback = callback;
   this.initialize(options || {});
+
+  this.firstRun = true;
+
+  if (options.map) {
+    this.setMap(options.map);
+  }
 }
+
+ThreejsLayer.prototype = new google.maps.OverlayView();
+
+ThreejsLayer.CSS_TRANSFORM = (function() {
+  var div = document.createElement('div');
+  var props = [
+    'transform',
+    'WebkitTransform',
+    'MozTransform',
+    'OTransform',
+    'msTransform'
+  ];
+
+  for (var i = 0; i < props.length; i++) {
+    var prop = props[i];
+    if (div.style[prop] !== undefined) {
+      return prop;
+    }
+  }
+
+  return props[0];
+})();
 
 ThreejsLayer.prototype.bindAll = function(){
   var instance = this;
@@ -18,16 +46,6 @@ ThreejsLayer.prototype.bindAll = function(){
 
 ThreejsLayer.prototype.initialize = function(options){
 
-  this.map = options.map;
-
-  this.layer = new CanvasLayer({
-    map: this.map,
-    animate: false,
-    callback: this.finalize
-  });
-
-  this.canvas = this.layer.canvas;
-
   this.camera = new THREE.OrthographicCamera(0, 1, 0, 1, -3000, 3000);
   this.camera.position.z = 1000;
 
@@ -38,12 +56,70 @@ ThreejsLayer.prototype.initialize = function(options){
     clearAlpha: 0
   });
 
-  this.resize();
+  this.canvas = this.renderer.domElement;
+};
 
-  google.maps.event.addListener(this.map, 'bounds_changed', this.update);
+ThreejsLayer.prototype.onAdd = function() {
+
+  this.map = this.getMap();
+
+  this.getPanes().overlayLayer.appendChild(this.canvas);
+
+  this.changeHandler = google.maps.event.addListener(
+    this.map,
+    'bounds_changed',
+    this.draw
+  );
+
+  this.draw();
+};
+
+ThreejsLayer.prototype.onRemove = function() {
+
+  if (!this.map) { return; }
+
+  this.map = null;
+
+  this.canvas.parentElement.removeChild(this.canvas);
+
+  if (this.changeHandler) {
+    google.maps.event.removeListener(this.changeHandler);
+    this.changeHandler = null;
+  }
+};
+
+ThreejsLayer.prototype.draw = function() {
+
+  if (!this.map) { return; }
+
+  var bounds = this.map.getBounds();
+
+  var topLeft = new google.maps.LatLng(
+    bounds.getNorthEast().lat(),
+    bounds.getSouthWest().lng()
+  );
+
+  var projection = this.getProjection();
+  var point = projection.fromLatLngToDivPixel(topLeft);
+
+  this.canvas.style[ThreejsLayer.CSS_TRANSFORM] = 'translate(' +
+      Math.round(point.x) + 'px,' +
+      Math.round(point.y) + 'px)';
+
+  if (this.firstRun) {
+    this.firstRun = false;
+    
+    if (this.callback){
+      this.callback(this);
+    }
+  }
+
+  this.update();
 };
 
 ThreejsLayer.prototype.resize = function(){
+
+  if (!this.map){ return; }
 
   var div = this.map.getDiv(),
     width = div.clientWidth,
@@ -105,17 +181,4 @@ ThreejsLayer.prototype.fromLatLngToVertex = function(latLng) {
   vertex.z = 0;
 
   return vertex;
-};
-
-ThreejsLayer.prototype.finalize = function() {
-
-  this.layer.getPanes().overlayLayer.appendChild( this.renderer.domElement );
-  this.canvas = this.renderer.domElement;
-  this.layer.canvas = this.canvas;
-
-  if (this.callback){
-    this.callback(this);
-  }
-
-  this.update();
 };
