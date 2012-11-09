@@ -16,6 +16,7 @@
     <script src="data.js"></script>
     <script src="styles.js"></script>
     <script src="../lib/detector.js"></script>
+    <script src="../lib/dat.gui.js"></script>
     <script src="../lib/three.js"></script>
     <script src="../threejs-layer.js"></script>
 
@@ -32,6 +33,7 @@
 
         var map = new google.maps.Map(container, {
           zoom: 3,
+          mapTypeControl: false,
           center: new google.maps.LatLng(10, 0),
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           styles: styles
@@ -63,6 +65,16 @@
 
           particles = new THREE.ParticleSystem( geometry, material );
           layer.add( particles );
+
+          gui = new dat.GUI();
+
+          function update(){
+            layer.render();
+          }
+
+          gui.add(material, 'size', 2, 100).onChange(update);
+          gui.add(material, 'opacity', 0.1, 1).onChange(update);
+
         });
       }
 
