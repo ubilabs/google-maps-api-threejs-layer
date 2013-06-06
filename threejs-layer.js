@@ -46,6 +46,8 @@ ThreejsLayer.prototype.bindAll = function(){
 
 ThreejsLayer.prototype.initialize = function(options){
 
+  this.options = options;
+
   this.camera = new THREE.OrthographicCamera(0, 1, 0, 1, -3000, 3000);
   this.camera.position.z = 1000;
 
@@ -164,7 +166,18 @@ ThreejsLayer.prototype.update = function() {
 };
 
 ThreejsLayer.prototype.render = function() {
-  this.renderer.render( this.scene, this.camera );
+  cancelAnimationFrame(this.animationFrame);
+  this.animationFrame = requestAnimationFrame(this.deferredRender);
+};
+
+ThreejsLayer.prototype.deferredRender = function(){
+  if (typeof this.options.render === false) {
+    return;
+  } else if (typeof this.options.render == "function"){
+    this.options.render();
+  } else {
+    this.renderer.render( this.scene, this.camera );
+  }
 };
 
 ThreejsLayer.prototype.add = function(geometry){
