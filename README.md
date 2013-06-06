@@ -30,4 +30,4 @@ new ThreejsLayer({ map: map }, function(layer){
 
 Developed by [Martin Kleppe](https://plus.google.com/103747379090421872359/) at [Ubilabs](http://www.ubilabs.net). 
 
-Released under the MIT Licence.
+Released under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
