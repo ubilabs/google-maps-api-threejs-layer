@@ -1,3 +1,8 @@
+/**
+ * Creates a new Three.js layer.
+ * @param {Object}   options  Options passed to initialize method.
+ * @param {Function} callback Callback to execute when map was updated.
+ */
 function ThreejsLayer(options, callback){
   this.bindAll();
   this.callback = callback;
@@ -10,8 +15,17 @@ function ThreejsLayer(options, callback){
   }
 }
 
+/**
+ * Extend OverlayView.
+ * @see https://developers.google.com/maps/documentation/javascript/reference#OverlayView
+ * @type {google.maps.OverlayView}
+ */
 ThreejsLayer.prototype = new google.maps.OverlayView();
 
+/**
+ * Get browser specifiv CSS transform property.
+ * @return {String} The property.
+ */
 ThreejsLayer.CSS_TRANSFORM = (function() {
   var div = document.createElement('div');
   var props = [
@@ -32,6 +46,9 @@ ThreejsLayer.CSS_TRANSFORM = (function() {
   return props[0];
 })();
 
+/**
+ * Bind all methods to the instance.
+ */
 ThreejsLayer.prototype.bindAll = function(){
   var instance = this;
 
@@ -44,6 +61,10 @@ ThreejsLayer.prototype.bindAll = function(){
   for (var all in instance){ bind(all); }
 };
 
+/**
+ * Initialize the layer with the given options.
+ * @param  {Object} options - Options
+ */
 ThreejsLayer.prototype.initialize = function(options){
 
   this.options = options;
@@ -61,6 +82,10 @@ ThreejsLayer.prototype.initialize = function(options){
   this.canvas = this.renderer.domElement;
 };
 
+/**
+ * This method is called once after setMap() is called with a valid map. 
+ * @see https://developers.google.com/maps/documentation/javascript/reference#OverlayView
+ */
 ThreejsLayer.prototype.onAdd = function() {
 
   this.map = this.getMap();
@@ -76,6 +101,10 @@ ThreejsLayer.prototype.onAdd = function() {
   this.draw();
 };
 
+/**
+ * This method is called once following a call to setMap(null).
+ * @see https://developers.google.com/maps/documentation/javascript/reference#OverlayView
+ */
 ThreejsLayer.prototype.onRemove = function() {
 
   if (!this.map) { return; }
@@ -90,6 +119,9 @@ ThreejsLayer.prototype.onRemove = function() {
   }
 };
 
+/**
+ * This method is called when the layer postion needs an update.
+ */
 ThreejsLayer.prototype.draw = function() {
 
   if (!this.map) { return; }
@@ -119,6 +151,9 @@ ThreejsLayer.prototype.draw = function() {
   this.update();
 };
 
+/**
+ * Call this method when the layer's size changed.
+ */
 ThreejsLayer.prototype.resize = function(){
 
   if (!this.map){ return; }
@@ -136,6 +171,9 @@ ThreejsLayer.prototype.resize = function(){
   this.update();
 };
 
+/**
+ * This method is called when the Three.js camera needs an update.
+ */
 ThreejsLayer.prototype.update = function() {
 
   var projection = this.map.getProjection(),
@@ -165,11 +203,18 @@ ThreejsLayer.prototype.update = function() {
   this.render();
 };
 
+/**
+ * Renders the layer deferred.
+ */
 ThreejsLayer.prototype.render = function() {
   cancelAnimationFrame(this.animationFrame);
   this.animationFrame = requestAnimationFrame(this.deferredRender);
 };
 
+/**
+ * The final rendering. If you have passed a function to `options.render`
+ * it will be executed here.
+ */
 ThreejsLayer.prototype.deferredRender = function(){
   if (typeof this.options.render === false) {
     return;
@@ -180,10 +225,19 @@ ThreejsLayer.prototype.deferredRender = function(){
   }
 };
 
+/**
+ * Shortcut method to add new geometry to the scene.
+ * @param  {Geometry} geometry The Three.js geometry to add.
+ */
 ThreejsLayer.prototype.add = function(geometry){
   this.scene.add(geometry);
 };
 
+/**
+ * Helper method to convert for LatLng to vertex.
+ * @param  {google.maps.LatLng} latLng - The LatLng to convert.
+ * @return {THREE.Vector3} The resulting vertex.
+ */
 ThreejsLayer.prototype.fromLatLngToVertex = function(latLng) {
   var projection = this.map.getProjection(),
     point = projection.fromLatLngToPoint(latLng),
