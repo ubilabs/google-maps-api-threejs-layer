@@ -91,7 +91,7 @@ ThreejsLayer.prototype.initialize = function(options){
 
   this.options = options;
 
-  this.camera = new THREE.OrthographicCamera(0, 1, 0, 1, -3000, 3000);
+  this.camera = new THREE.OrthographicCamera(0, 255, 0, 255, -3000, 3000);
   this.camera.position.z = 1000;
 
   this.scene = new THREE.Scene();
@@ -216,8 +216,8 @@ ThreejsLayer.prototype.update = function() {
 
   this.resize();
 
-  this.camera.position.x = offset.x / 256 ;
-  this.camera.position.y = offset.y / 256;
+  this.camera.position.x = offset.x;
+  this.camera.position.y = offset.y;
 
   this.camera.scale.x = this.width / 256 / scale;
   this.camera.scale.y = this.height / 256 / scale;
@@ -265,8 +265,8 @@ ThreejsLayer.prototype.fromLatLngToVertex = function(latLng) {
     point = projection.fromLatLngToPoint(latLng),
     vertex = new THREE.Vector3();
 
-  vertex.x = point.x / 256;
-  vertex.y = point.y / 256;
+  vertex.x = point.x;
+  vertex.y = point.y;
   vertex.z = 0;
 
   return vertex;
