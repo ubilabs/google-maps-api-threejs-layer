@@ -33,3 +33,5 @@ Based on the excellent [CanvasLayer](https://google-maps-utility-library-v3.goog
 Developed by [Martin Kleppe](https://plus.google.com/103747379090421872359/) at [Ubilabs](http://www.ubilabs.net). 
 
 Released under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+
+[![Analytics](https://ga-beacon.appspot.com/UA-57649-14/google-maps-api-threejs-layer)](https://github.com/igrigorik/ga-beacon)
