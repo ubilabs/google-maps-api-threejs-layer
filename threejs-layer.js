@@ -97,6 +97,7 @@ ThreejsLayer.prototype.initialize = function(options){
   this.scene = new THREE.Scene();
 
   this.renderer = new THREE.WebGLRenderer({
+    alpha: true,
     clearColor: 0x000000,
     clearAlpha: 0
   });
