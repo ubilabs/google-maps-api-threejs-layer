@@ -34,7 +34,8 @@
           styles: styles
         });
 
-        new ThreejsLayer({ map: map,renderertype:'Canvas' }, function(layer){
+        // if you add renderertype:'Canvas' to the options for ThreejsLayer, you can force the usage of CanvasRenderer
+        new ThreejsLayer({ map: map }, function(layer){
           
           if (layer.renderertype=='Canvas' || !Detector.webgl) {
             texture = new THREE.Texture(generateSprite());
