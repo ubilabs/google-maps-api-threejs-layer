@@ -93,14 +93,33 @@ ThreejsLayer.prototype.initialize = function(options){
 
   this.camera = new THREE.OrthographicCamera(0, 255, 0, 255, -3000, 3000);
   this.camera.position.z = 1000;
-
+  this.renderertype = options.renderertype || '';
   this.scene = new THREE.Scene();
 
-  this.renderer = new THREE.WebGLRenderer({
-    alpha: true,
-    clearColor: 0x000000,
-    clearAlpha: 0
-  });
+  this.webgl = (function () {
+    try {
+      var canvas = document.createElement('canvas');
+      return !!window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+    } catch (e) {
+      return false;
+    }
+  })();
+
+  if (this.renderertype == 'Canvas' || !this.webgl) {
+    this.renderer = new THREE.CanvasRenderer({
+      alpha: true,
+      clearColor: 0x000000,
+      clearAlpha: 0
+    });
+    this.renderertype = 'Canvas';
+  } else {
+    this.renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      clearColor: 0x000000,
+      clearAlpha: 0
+    });
+    this.renderertype = 'WebGL';
+  }
 
   this.canvas = this.renderer.domElement;
 };
