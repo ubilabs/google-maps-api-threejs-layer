@@ -36,7 +36,7 @@
 
         // if you add renderertype:'Canvas' to the options for ThreejsLayer, you can force the usage of CanvasRenderer
         new ThreejsLayer({ map: map }, function(layer){
-          
+
           if (layer.renderertype=='Canvas' || !Detector.webgl) {
             texture = new THREE.Texture(generateSprite());
             particles = new THREE.Object3D();
@@ -48,8 +48,8 @@
               depthTest: false,
               transparent: true
             });
-            
-            
+
+
             photos.forEach(function (photo) {
               var particle = new THREE.Sprite(material);
               var location = new google.maps.LatLng(photo[0], photo[1]),
@@ -74,7 +74,7 @@
 
           texture.needsUpdate = true;
 
-          material = new THREE.ParticleBasicMaterial({
+          material = new THREE.PointCloudMaterial({
             size: 20,
             map: texture,
             opacity: 0.3,
@@ -83,7 +83,7 @@
             transparent: true
           });
 
-          particles = new THREE.ParticleSystem( geometry, material );
+          particles = new THREE.PointCloud( geometry, material );
           }
           layer.add( particles );
 
