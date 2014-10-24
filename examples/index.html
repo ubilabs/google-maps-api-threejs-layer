@@ -61,29 +61,29 @@
               material.size = 20;
             });
           } else {
-          var geometry = new THREE.Geometry(),
-            texture = new THREE.Texture(generateSprite()),
-            material, particles;
+            var geometry = new THREE.Geometry(),
+              texture = new THREE.Texture(generateSprite()),
+              material, particles;
 
-          photos.forEach(function(photo){
-            var location = new google.maps.LatLng(photo[0], photo[1]),
-              vertex = layer.fromLatLngToVertex(location);
+            photos.forEach(function(photo){
+              var location = new google.maps.LatLng(photo[0], photo[1]),
+                vertex = layer.fromLatLngToVertex(location);
 
-            geometry.vertices.push( vertex );
-          });
+              geometry.vertices.push( vertex );
+            });
 
-          texture.needsUpdate = true;
+            texture.needsUpdate = true;
 
-          material = new THREE.PointCloudMaterial({
-            size: 20,
-            map: texture,
-            opacity: 0.3,
-            blending: THREE.AdditiveBlending,
-            depthTest: false,
-            transparent: true
-          });
+            material = new THREE.PointCloudMaterial({
+              size: 20,
+              map: texture,
+              opacity: 0.3,
+              blending: THREE.AdditiveBlending,
+              depthTest: false,
+              transparent: true
+            });
 
-          particles = new THREE.PointCloud( geometry, material );
+            particles = new THREE.PointCloud( geometry, material );
           }
           layer.add( particles );
 

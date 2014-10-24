@@ -45,7 +45,7 @@ ThreejsLayer.prototype = new google.maps.OverlayView();
 
 /**
  * Get browser specifiv CSS transform property.
- * 
+ *
  * @return {String} The property.
  */
 ThreejsLayer.CSS_TRANSFORM = (function() {
@@ -125,7 +125,7 @@ ThreejsLayer.prototype.initialize = function(options){
 };
 
 /**
- * This method is called once after setMap() is called with a valid map. 
+ * This method is called once after setMap() is called with a valid map.
  * @see https://developers.google.com/maps/documentation/javascript/reference#OverlayView
  */
 ThreejsLayer.prototype.onAdd = function() {
@@ -184,7 +184,7 @@ ThreejsLayer.prototype.draw = function() {
 
   if (this.firstRun) {
     this.firstRun = false;
-    
+
     if (this.callback){
       this.callback(this);
     }
