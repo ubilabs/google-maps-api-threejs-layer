@@ -1,0 +1,31 @@
+{
+  "name": "google-maps-api-threejs-layer",
+  "version": "0.0.71",
+  "homepage": "https://github.com/ubilabs/google-maps-api-threejs-layer",
+  "description": "https://github.com/ubilabs/google-maps-api-threejs-layer",
+  "main": "threejs-layer.js",
+  "keywords": [
+    "three",
+    "threejs",
+    "three.js",
+    "3D",
+    "webgl",
+    "google",
+    "maps",
+    "googlemaps",
+    "gmaps"
+  ],
+  "license": "Apache2",
+  "ignore": [
+    "**/.*",
+    "*.md",
+    "docs",
+    "editor",
+    "examples/*",
+    "!examples/js",
+    "src",
+    "test",
+    "utils",
+    "LICENSE"
+  ]
+}
