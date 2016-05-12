@@ -91,7 +91,7 @@ ThreejsLayer.prototype.initialize = function(options){
 
   this.options = options;
 
-  this.camera = new THREE.OrthographicCamera(0, 255, 0, 255, -3000, 3000);
+  this.camera = new THREE.OrthographicCamera(0, 256, 256, 0, -3000, 3000);
   this.camera.position.z = 1000;
   this.renderertype = options.renderertype || '';
   this.scene = new THREE.Scene();
@@ -226,7 +226,7 @@ ThreejsLayer.prototype.update = function() {
   bounds = this.map.getBounds();
 
   topLeft = new google.maps.LatLng(
-    bounds.getNorthEast().lat(),
+    bounds.getSouthWest().lat(),
     bounds.getSouthWest().lng()
   );
 
@@ -237,7 +237,7 @@ ThreejsLayer.prototype.update = function() {
   this.resize();
 
   this.camera.position.x = offset.x;
-  this.camera.position.y = offset.y;
+  this.camera.position.y = 255-offset.y;
 
   this.camera.scale.x = this.width / 256 / scale;
   this.camera.scale.y = this.height / 256 / scale;
@@ -286,7 +286,7 @@ ThreejsLayer.prototype.fromLatLngToVertex = function(latLng) {
     vertex = new THREE.Vector3();
 
   vertex.x = point.x;
-  vertex.y = point.y;
+  vertex.y = 255 - point.y;
   vertex.z = 0;
 
   return vertex;
