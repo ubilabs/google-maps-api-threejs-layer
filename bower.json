@@ -1,6 +1,6 @@
 {
   "name": "google-maps-api-threejs-layer",
-  "version": "0.0.71",
+  "version": "0.1.0",
   "homepage": "https://github.com/ubilabs/google-maps-api-threejs-layer",
   "description": "https://github.com/ubilabs/google-maps-api-threejs-layer",
   "main": "threejs-layer.js",
