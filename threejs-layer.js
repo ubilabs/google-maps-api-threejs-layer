@@ -174,7 +174,6 @@ ThreejsLayer.prototype.draw = function() {
     bounds.getNorthEast().lat(),
     bounds.getSouthWest().lng()
   );
-
   var projection = this.getProjection();
   var point = projection.fromLatLngToDivPixel(topLeft);
   var width = projection.getWorldWidth();
@@ -186,6 +185,16 @@ ThreejsLayer.prototype.draw = function() {
     center < 180
   ) {
     point.x -= width;
+  }
+
+  // If only two partial worlds fit the screen,
+  // show canvas on larger world.
+  var width = projection.getWorldWidth();
+  // Get left position of canvas in the container.
+  var containerLeft = projection.fromLatLngToContainerPixel(topLeft).x;
+  // If left is larger than half of the container size, adjust position.
+  if (containerLeft > this.canvas.width / 2) {
+    point.x = point.x - width;
   }
 
   this.canvas.style[ThreejsLayer.CSS_TRANSFORM] = 'translate(' +
