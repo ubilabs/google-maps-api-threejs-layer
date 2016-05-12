@@ -177,6 +177,16 @@ ThreejsLayer.prototype.draw = function() {
 
   var projection = this.getProjection();
   var point = projection.fromLatLngToDivPixel(topLeft);
+  var width = projection.getWorldWidth();
+  var center = (this.map.getCenter().lng() % 360 + 360) % 360;
+
+  if (
+    bounds.getSouthWest().lng() == -180 &&
+    bounds.getNorthEast().lng() == 180 &&
+    center < 180
+  ) {
+    point.x -= width;
+  }
 
   this.canvas.style[ThreejsLayer.CSS_TRANSFORM] = 'translate(' +
       Math.round(point.x) + 'px,' +
@@ -233,6 +243,13 @@ ThreejsLayer.prototype.update = function() {
   zoom = this.map.getZoom();
   scale = Math.pow(2, zoom);
   offset = projection.fromLatLngToPoint(topLeft);
+
+  if (
+    bounds.getCenter().lng() <
+    bounds.getSouthWest().lng()
+  ) {
+    offset.x -= 256;
+  }
 
   this.resize();
 
