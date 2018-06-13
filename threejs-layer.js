@@ -24,7 +24,7 @@
  * @param {Object}   options  Options passed to initialize method.
  * @param {Function} callback Callback to execute when map was updated.
  */
-function ThreejsLayer(options, callback){
+function ThreejsLayer(options, callback) {
   this.bindAll();
   this.callback = callback;
   this.initialize(options || {});
@@ -48,7 +48,7 @@ ThreejsLayer.prototype = new google.maps.OverlayView();
  *
  * @return {String} The property.
  */
-ThreejsLayer.CSS_TRANSFORM = (function() {
+ThreejsLayer.CSS_TRANSFORM = (function () {
   var div = document.createElement('div');
   var props = [
     'transform',
@@ -71,23 +71,29 @@ ThreejsLayer.CSS_TRANSFORM = (function() {
 /**
  * Bind all methods to the instance.
  */
-ThreejsLayer.prototype.bindAll = function(){
+ThreejsLayer.prototype.bindAll = function () {
   var instance = this;
 
   function bind(name) {
     var method = instance[name];
-    if (typeof method != "function"){ return; }
-    instance[name] = function() { return method.apply(instance, arguments); };
+    if (typeof method != "function") {
+      return;
+    }
+    instance[name] = function () {
+      return method.apply(instance, arguments);
+    };
   }
 
-  for (var all in instance){ bind(all); }
+  for (var all in instance) {
+    bind(all);
+  }
 };
 
 /**
  * Initialize the layer with the given options.
  * @param  {Object} options - Options
  */
-ThreejsLayer.prototype.initialize = function(options){
+ThreejsLayer.prototype.initialize = function (options) {
 
   this.options = options;
 
@@ -128,7 +134,7 @@ ThreejsLayer.prototype.initialize = function(options){
  * This method is called once after setMap() is called with a valid map.
  * @see https://developers.google.com/maps/documentation/javascript/reference#OverlayView
  */
-ThreejsLayer.prototype.onAdd = function() {
+ThreejsLayer.prototype.onAdd = function () {
 
   this.map = this.getMap();
 
@@ -147,9 +153,11 @@ ThreejsLayer.prototype.onAdd = function() {
  * This method is called once following a call to setMap(null).
  * @see https://developers.google.com/maps/documentation/javascript/reference#OverlayView
  */
-ThreejsLayer.prototype.onRemove = function() {
+ThreejsLayer.prototype.onRemove = function () {
 
-  if (!this.map) { return; }
+  if (!this.map) {
+    return;
+  }
 
   this.map = null;
 
@@ -164,9 +172,11 @@ ThreejsLayer.prototype.onRemove = function() {
 /**
  * This method is called when the layer postion needs an update.
  */
-ThreejsLayer.prototype.draw = function() {
+ThreejsLayer.prototype.draw = function () {
 
-  if (!this.map) { return; }
+  if (!this.map) {
+    return;
+  }
 
   var bounds = this.map.getBounds();
 
@@ -189,13 +199,13 @@ ThreejsLayer.prototype.draw = function() {
   }
 
   this.canvas.style[ThreejsLayer.CSS_TRANSFORM] = 'translate(' +
-      Math.round(point.x) + 'px,' +
-      Math.round(point.y) + 'px)';
+    Math.round(point.x) + 'px,' +
+    Math.round(point.y) + 'px)';
 
   if (this.firstRun) {
     this.firstRun = false;
 
-    if (this.callback){
+    if (this.callback) {
       this.callback(this);
     }
   }
@@ -206,15 +216,19 @@ ThreejsLayer.prototype.draw = function() {
 /**
  * Call this method when the layer's size changed.
  */
-ThreejsLayer.prototype.resize = function(){
+ThreejsLayer.prototype.resize = function () {
 
-  if (!this.map){ return; }
+  if (!this.map) {
+    return;
+  }
 
   var div = this.map.getDiv(),
     width = div.clientWidth,
     height = div.clientHeight;
 
-  if (width == this.width && height == this.height){ return; }
+  if (width == this.width && height == this.height) {
+    return;
+  }
 
   this.width = width;
   this.height = height;
@@ -226,12 +240,14 @@ ThreejsLayer.prototype.resize = function(){
 /**
  * This method is called when the Three.js camera needs an update.
  */
-ThreejsLayer.prototype.update = function() {
+ThreejsLayer.prototype.update = function () {
 
   var projection = this.map.getProjection(),
     zoom, scale, offset, bounds, topLeft;
 
-  if (!projection){ return; }
+  if (!projection) {
+    return;
+  }
 
   bounds = this.map.getBounds();
 
@@ -254,7 +270,7 @@ ThreejsLayer.prototype.update = function() {
   this.resize();
 
   this.camera.position.x = offset.x;
-  this.camera.position.y = 255-offset.y;
+  this.camera.position.y = 255 - offset.y;
 
   this.camera.scale.x = this.width / 256 / scale;
   this.camera.scale.y = this.height / 256 / scale;
@@ -265,7 +281,7 @@ ThreejsLayer.prototype.update = function() {
 /**
  * Renders the layer deferred.
  */
-ThreejsLayer.prototype.render = function() {
+ThreejsLayer.prototype.render = function () {
   cancelAnimationFrame(this.animationFrame);
   this.animationFrame = requestAnimationFrame(this.deferredRender);
 };
@@ -274,13 +290,13 @@ ThreejsLayer.prototype.render = function() {
  * The final rendering. If you have passed a function to `options.render`
  * it will be executed here.
  */
-ThreejsLayer.prototype.deferredRender = function(){
+ThreejsLayer.prototype.deferredRender = function () {
   if (typeof this.options.render === false) {
     return;
-  } else if (typeof this.options.render == "function"){
+  } else if (typeof this.options.render == "function") {
     this.options.render();
   } else {
-    this.renderer.render( this.scene, this.camera );
+    this.renderer.render(this.scene, this.camera);
   }
 };
 
@@ -288,7 +304,7 @@ ThreejsLayer.prototype.deferredRender = function(){
  * Shortcut method to add new geometry to the scene.
  * @param  {Geometry} geometry The Three.js geometry to add.
  */
-ThreejsLayer.prototype.add = function(geometry){
+ThreejsLayer.prototype.add = function (geometry) {
   this.scene.add(geometry);
 };
 
@@ -297,7 +313,7 @@ ThreejsLayer.prototype.add = function(geometry){
  * @param  {google.maps.LatLng} latLng - The LatLng to convert.
  * @return {THREE.Vector3} The resulting vertex.
  */
-ThreejsLayer.prototype.fromLatLngToVertex = function(latLng) {
+ThreejsLayer.prototype.fromLatLngToVertex = function (latLng) {
   var projection = this.map.getProjection(),
     point = projection.fromLatLngToPoint(latLng),
     vertex = new THREE.Vector3();
